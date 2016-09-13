@@ -1,12 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ACO {
-    class Program {
-        static void Main(string[] args) {
+namespace ACO
+{
+    internal static class Program
+    {
+        private static void Main()
+        {
+            var algorithm = new Algorithm();
+            var isFileParsed = algorithm.ParseFile("Graphs/yuzSHP55.aco");
+            if (!isFileParsed)
+                Console.WriteLine("File cannot be parsed");
         }
     }
 }
