@@ -48,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Graphs\yuzSHP155.aco" />
+    <None Include="Graphs\yuzSHP55.aco" />
+    <None Include="Graphs\yuzSHP95.aco" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
