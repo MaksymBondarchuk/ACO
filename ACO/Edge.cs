@@ -1,4 +1,6 @@
-﻿namespace ACO
+﻿using System;
+
+namespace ACO
 {
     public class Edge
     {
@@ -15,6 +17,6 @@
 
         public double InvertedWeight { get; set; }
 
-        public double Pheromones { get; set; }
+        public double Pheromones { get; set; } = new Random().NextDouble();
     }
 }

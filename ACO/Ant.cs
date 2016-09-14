@@ -4,6 +4,6 @@ namespace ACO
 {
     public class Ant
     {
-        public List<int> VisitedNodes { get; set; } = new List<int>();
+        public List<int> VisitedNodes { get; } = new List<int> {0};
     }
 }

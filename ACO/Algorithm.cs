@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ACO
 {
     public class Algorithm
     {
+        #region Constants: private
+        private const int IterationsNumber = 1000;
+        private const double Alpha = .5;
+        private const double Beta = .5;
+        #endregion
+
         #region Properties: private
         private int ProblemSize { get; set; }
 
@@ -67,18 +74,35 @@ namespace ACO
 
         private void Init(int colonySize)
         {
-            var random = new Random();
             for (var i = 0; i < colonySize; i++)
-            {
-                var ant = new Ant();
-                ant.VisitedNodes.Add(random.Next(ProblemSize - 1));
-                Ants.Add(ant);
-            }
+                Ants.Add(new Ant());
         }
 
         public void Run(int colonySize)
         {
             Init(colonySize);
+
+            for (var iter = 0; iter < IterationsNumber; iter++)
+            {
+                foreach (var ant in Ants)
+                {
+                    // Generate solutions
+                    var n = Nodes[ant.VisitedNodes.Last()].EdgesIndexes
+                        .Where(edgeIdx => edgeIdx != -1)
+                        .Sum(edgeIdx => Edges[edgeIdx].InvertedWeight * Edges[edgeIdx].Pheromones);
+
+                    var random = new Random();
+                    for (var i = 0; i < ProblemSize; i++)
+                    {
+                        var edgeIdx = Nodes[ant.VisitedNodes.Last()].EdgesIndexes[i];
+                        var p = Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
+                            Math.Pow(Edges[edgeIdx].Pheromones, Beta) / n;
+                        if (!(random.NextDouble() <= p)) continue;
+                        ant.VisitedNodes.Add(i);
+                        break;
+                    }
+                }
+            }
         }
     }
 }
