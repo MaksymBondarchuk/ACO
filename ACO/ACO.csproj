@@ -44,7 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm.cs" />
-    <Compile Include="Node.cs" />
+    <Compile Include="Ant.cs" />
+    <Compile Include="Edge.cs" />
+    <Compile Include="Vertex.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
