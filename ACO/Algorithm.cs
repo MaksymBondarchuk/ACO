@@ -12,6 +12,7 @@ namespace ACO
         private const int IterationsNumber = 1000;
         private const double Alpha = .5;
         private const double Beta = .5;
+        private const double Q = 1;
         #endregion
 
         #region Properties: private
@@ -60,7 +61,7 @@ namespace ACO
 
                             Edges.Add(new Edge
                             {
-                                InvertedWeight = 1.0 / weight
+                                Weight = weight
                             });
                             node.EdgesIndexes.Add(Edges.Count - 1);
                         }
@@ -87,19 +88,29 @@ namespace ACO
                 foreach (var ant in Ants)
                 {
                     // Generate solutions
-                    var n = Nodes[ant.VisitedNodes.Last()].EdgesIndexes
+                    var n = Nodes[ant.VisitedVertices.Last()].EdgesIndexes
                         .Where(edgeIdx => edgeIdx != -1)
                         .Sum(edgeIdx => Edges[edgeIdx].InvertedWeight * Edges[edgeIdx].Pheromones);
 
                     var random = new Random();
                     for (var i = 0; i < ProblemSize; i++)
                     {
-                        var edgeIdx = Nodes[ant.VisitedNodes.Last()].EdgesIndexes[i];
+                        var edgeIdx = Nodes[ant.VisitedVertices.Last()].EdgesIndexes[i];
                         var p = Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
                             Math.Pow(Edges[edgeIdx].Pheromones, Beta) / n;
                         if (!(random.NextDouble() <= p)) continue;
-                        ant.VisitedNodes.Add(i);
+                        ant.VisitedVertices.Add(i);
+                        ant.UsedEdges.Add(edgeIdx);
+                        ant.PathWeight += Edges[edgeIdx].Weight;
                         break;
+                    }
+
+                    // Update pheromones
+                    if (ant.VisitedVertices.Last() == ProblemSize - 1)
+                    {
+                        var delta = Q / ant.PathWeight;
+                        foreach (var edgeIdx in ant.UsedEdges.Where(edgeIdx => edgeIdx != -1))
+                            Edges[edgeIdx].Pheromones += delta;
                     }
                 }
             }
