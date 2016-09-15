@@ -24,6 +24,10 @@ namespace ACO
         private List<Edge> Edges { get; } = new List<Edge>();
 
         private List<Ant> Ants { get; } = new List<Ant>();
+
+        private double BestWeight { get; set; }
+
+        private string BestWay { get; set; }
         #endregion
 
         public bool ParseFile(string fileName)
@@ -119,13 +123,25 @@ namespace ACO
                         var delta = Q / ant.PathWeight;
                         foreach (var edgeIdx in ant.UsedEdges.Where(edgeIdx => edgeIdx != -1))
                             Edges[edgeIdx].Pheromones += delta;
+
+                        if (ant.PathWeight < BestWeight)
+                        {
+                            BestWeight = ant.PathWeight;
+                            BestWay = string.Join(", ", ant.VisitedVertices.ToArray());
+                        }
+
                         ant.VisitedVertices.Clear();
                         ant.VisitedVertices.Add(0);
                         ant.UsedEdges.Clear();
                         ant.UsedEdges.Add(-1);
+                        ant.PathWeight = int.MaxValue;
                     }
                 }
+
+                Console.WriteLine($"#{iter,-4} Best weight: {BestWeight}");
             }
+
+            Console.WriteLine($"\nBest way: {BestWay}\nIts weight: {BestWeight}");
         }
     }
 }
