@@ -13,6 +13,7 @@ namespace ACO
         private const double Alpha = .5;
         private const double Beta = .5;
         private const double Q = 1;
+        private const double Rho = .1;
         #endregion
 
         #region Properties: private
@@ -85,6 +86,10 @@ namespace ACO
 
             for (var iter = 0; iter < IterationsNumber; iter++)
             {
+                // Evaporate pheromones
+                foreach (var edge in Edges)
+                    edge.Pheromones *= 1 - Rho;
+
                 foreach (var ant in Ants)
                 {
                     // Generate solutions
@@ -96,6 +101,9 @@ namespace ACO
                     for (var i = 0; i < ProblemSize; i++)
                     {
                         var edgeIdx = Nodes[ant.VisitedVertices.Last()].EdgesIndexes[i];
+                        if (edgeIdx == -1)
+                            continue;
+
                         var p = Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
                             Math.Pow(Edges[edgeIdx].Pheromones, Beta) / n;
                         if (!(random.NextDouble() <= p)) continue;
@@ -111,6 +119,10 @@ namespace ACO
                         var delta = Q / ant.PathWeight;
                         foreach (var edgeIdx in ant.UsedEdges.Where(edgeIdx => edgeIdx != -1))
                             Edges[edgeIdx].Pheromones += delta;
+                        ant.VisitedVertices.Clear();
+                        ant.VisitedVertices.Add(0);
+                        ant.UsedEdges.Clear();
+                        ant.UsedEdges.Add(-1);
                     }
                 }
             }
