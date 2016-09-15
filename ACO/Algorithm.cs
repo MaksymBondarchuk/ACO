@@ -25,7 +25,7 @@ namespace ACO
 
         private List<Ant> Ants { get; } = new List<Ant>();
 
-        private double BestWeight { get; set; }
+        private double BestWeight { get; set; } = double.MaxValue;
 
         private string BestWay { get; set; }
         #endregion
@@ -39,6 +39,7 @@ namespace ACO
             using (var sr = new StreamReader(filePath))
             {
                 string line;
+                var random = new Random();
                 while ((line = sr.ReadLine()) != null)
                 {
                     if (line.Length == 0)
@@ -64,9 +65,16 @@ namespace ACO
                                 continue;
                             }
 
+                            if (i < Nodes.Count)
+                            {
+                                node.EdgesIndexes.Add(Nodes[i].EdgesIndexes[Nodes.Count]);
+                                continue;
+                            }
                             Edges.Add(new Edge
                             {
-                                Weight = weight
+                                Weight = weight,
+                                Pheromones = random.NextDouble(),
+                                Vertices = new List<int> { i, Nodes.Count }
                             });
                             node.EdgesIndexes.Add(Edges.Count - 1);
                         }
@@ -88,6 +96,7 @@ namespace ACO
         {
             Init(colonySize);
 
+            var random = new Random();
             for (var iter = 0; iter < IterationsNumber; iter++)
             {
                 // Evaporate pheromones
@@ -97,15 +106,21 @@ namespace ACO
                 foreach (var ant in Ants)
                 {
                     // Generate solutions
-                    var n = Nodes[ant.VisitedVertices.Last()].EdgesIndexes
-                        .Where(edgeIdx => edgeIdx != -1)
-                        .Sum(edgeIdx => Edges[edgeIdx].InvertedWeight * Edges[edgeIdx].Pheromones);
+                    var n = 0.0;
 
-                    var random = new Random();
                     for (var i = 0; i < ProblemSize; i++)
                     {
                         var edgeIdx = Nodes[ant.VisitedVertices.Last()].EdgesIndexes[i];
-                        if (edgeIdx == -1)
+                        if (edgeIdx == -1 || ant.VisitedVertices.Contains(Edges[edgeIdx].Vertices.First(t => t != ant.VisitedVertices.Last())))
+                            continue;
+                        n += Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
+                             Math.Pow(Edges[edgeIdx].Pheromones, Beta);
+                    }
+
+                    for (var i = 0; i < ProblemSize; i++)
+                    {
+                        var edgeIdx = Nodes[ant.VisitedVertices.Last()].EdgesIndexes[i];
+                        if (edgeIdx == -1 || ant.VisitedVertices.Contains(Edges[edgeIdx].Vertices.First(t => t != ant.VisitedVertices.Last())))
                             continue;
 
                         var p = Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
@@ -134,7 +149,7 @@ namespace ACO
                         ant.VisitedVertices.Add(0);
                         ant.UsedEdges.Clear();
                         ant.UsedEdges.Add(-1);
-                        ant.PathWeight = int.MaxValue;
+                        ant.PathWeight = 0;
                     }
                 }
 

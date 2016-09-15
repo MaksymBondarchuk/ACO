@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ACO
 {
@@ -17,6 +18,13 @@ namespace ACO
 
         public double InvertedWeight { get; set; }
 
-        public double Pheromones { get; set; } = new Random().NextDouble();
+        public double Pheromones { get; set; }
+
+        public List<int> Vertices { get; set; }
+
+        public override string ToString()
+        {
+            return $"Weight: {Weight,-4} Pheromones: {Pheromones, -20:0.0000000000}";
+        }
     }
 }

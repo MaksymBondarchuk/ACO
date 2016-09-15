@@ -8,7 +8,7 @@ namespace ACO
         {
             var algorithm = new Algorithm();
 
-            var isFileParsed = algorithm.ParseFile("Graphs/yuzSHP55.aco");
+            var isFileParsed = algorithm.ParseFile("Graphs/yuzSHP95.aco");
             if (!isFileParsed)
             {
                 Console.WriteLine("File cannot be parsed");
