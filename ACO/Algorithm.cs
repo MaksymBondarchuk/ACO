@@ -24,10 +24,6 @@ namespace ACO
         private List<Edge> Edges { get; } = new List<Edge>();
 
         private List<Ant> Ants { get; } = new List<Ant>();
-
-        private double BestWeight { get; set; } = double.MaxValue;
-
-        private string BestWay { get; set; }
         #endregion
 
         public bool ParseFile(string fileName)
@@ -97,6 +93,9 @@ namespace ACO
             Init(colonySize);
 
             var random = new Random();
+            var bestWeight = double.MaxValue;
+            var bestWay = string.Empty;
+            var lastImprovementOn = 0;
             for (var iter = 0; iter < IterationsNumber; iter++)
             {
                 // Evaporate pheromones
@@ -139,10 +138,11 @@ namespace ACO
                         foreach (var edgeIdx in ant.UsedEdges.Where(edgeIdx => edgeIdx != -1))
                             Edges[edgeIdx].Pheromones += delta;
 
-                        if (ant.PathWeight < BestWeight)
+                        if (ant.PathWeight < bestWeight)
                         {
-                            BestWeight = ant.PathWeight;
-                            BestWay = string.Join(", ", ant.VisitedVertices.ToArray());
+                            bestWeight = ant.PathWeight;
+                            bestWay = string.Join(", ", ant.VisitedVertices.ToArray());
+                            lastImprovementOn = iter;
                         }
 
                         ant.VisitedVertices.Clear();
@@ -153,10 +153,11 @@ namespace ACO
                     }
                 }
 
-                Console.WriteLine($"#{iter,-4} Best weight: {BestWeight}");
+                Console.WriteLine($"#{iter,-4} Best weight: {bestWeight}");
             }
 
-            Console.WriteLine($"\nBest way: {BestWay}\nIts weight: {BestWeight}");
+            Console.WriteLine($"\nBest way: {bestWay}\nIts weight: {bestWeight}" +
+                              $"\nLast mprovement was on iteration #{lastImprovementOn}");
         }
     }
 }
