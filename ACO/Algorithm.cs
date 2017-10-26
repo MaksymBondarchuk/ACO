@@ -157,7 +157,7 @@ namespace ACO
             }
 
             Console.WriteLine($"\nBest way: {bestWay}\nIts weight: {bestWeight}" +
-                              $"\nLast mprovement was on iteration #{lastImprovementOn}");
+                              $"\nLast improvement was on iteration #{lastImprovementOn}");
         }
     }
 }
