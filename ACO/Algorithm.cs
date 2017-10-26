@@ -51,19 +51,19 @@ namespace ACO
 						if (matches.Count != ProblemSize)
 							return false;
 
-						var node = new Vertex();
+						var vertex = new Vertex();
 						for (var i = 0; i < matches.Count; i++)
 						{
 							var weight = Convert.ToInt32(matches[i].Value);
 							if (weight == 0)
 							{
-								node.EdgesIndexes.Add(-1);
+								vertex.EdgesIndexes.Add(-1);
 								continue;
 							}
 
 							if (i < Vertices.Count)
 							{
-								node.EdgesIndexes.Add(Vertices[i].EdgesIndexes[Vertices.Count]);
+								vertex.EdgesIndexes.Add(Vertices[i].EdgesIndexes[Vertices.Count]);
 								continue;
 							}
 							Edges.Add(new Edge
@@ -72,9 +72,9 @@ namespace ACO
 								Pheromones = random.NextDouble(),
 								Vertices = new List<int> { i, Vertices.Count }
 							});
-							node.EdgesIndexes.Add(Edges.Count - 1);
+							vertex.EdgesIndexes.Add(Edges.Count - 1);
 						}
-						Vertices.Add(node);
+						Vertices.Add(vertex);
 					}
 				}
 			}
