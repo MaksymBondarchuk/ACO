@@ -19,7 +19,7 @@ namespace ACO
 		#region Properties: private
 		private int ProblemSize { get; set; }
 
-		private List<Vertex> Nodes { get; } = new List<Vertex>();
+		private List<Vertex> Vertices { get; } = new List<Vertex>();
 
 		private List<Edge> Edges { get; } = new List<Edge>();
 
@@ -61,20 +61,20 @@ namespace ACO
 								continue;
 							}
 
-							if (i < Nodes.Count)
+							if (i < Vertices.Count)
 							{
-								node.EdgesIndexes.Add(Nodes[i].EdgesIndexes[Nodes.Count]);
+								node.EdgesIndexes.Add(Vertices[i].EdgesIndexes[Vertices.Count]);
 								continue;
 							}
 							Edges.Add(new Edge
 							{
 								Weight = weight,
 								Pheromones = random.NextDouble(),
-								Vertices = new List<int> { i, Nodes.Count }
+								Vertices = new List<int> { i, Vertices.Count }
 							});
 							node.EdgesIndexes.Add(Edges.Count - 1);
 						}
-						Nodes.Add(node);
+						Vertices.Add(node);
 					}
 				}
 			}
@@ -109,7 +109,7 @@ namespace ACO
 
 					for (var i = 0; i < ProblemSize; i++)
 					{
-						var edgeIdx = Nodes[ant.VisitedVertices.Last()].EdgesIndexes[i];
+						var edgeIdx = Vertices[ant.VisitedVertices.Last()].EdgesIndexes[i];
 						if (edgeIdx == -1 || ant.VisitedVertices.Contains(Edges[edgeIdx].Vertices.First(t => t != ant.VisitedVertices.Last())))
 							continue;
 						n += Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
@@ -118,7 +118,7 @@ namespace ACO
 
 					for (var i = 0; i < ProblemSize; i++)
 					{
-						var edgeIdx = Nodes[ant.VisitedVertices.Last()].EdgesIndexes[i];
+						var edgeIdx = Vertices[ant.VisitedVertices.Last()].EdgesIndexes[i];
 						if (edgeIdx == -1 || ant.VisitedVertices.Contains(Edges[edgeIdx].Vertices.First(t => t != ant.VisitedVertices.Last())))
 							continue;
 
