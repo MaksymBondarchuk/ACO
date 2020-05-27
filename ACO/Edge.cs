@@ -5,6 +5,7 @@ namespace ACO
 	public class Edge
 	{
 		private int _weight;
+
 		public int Weight
 		{
 			get { return _weight; }
