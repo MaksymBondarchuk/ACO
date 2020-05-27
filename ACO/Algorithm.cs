@@ -9,14 +9,17 @@ namespace ACO
 	public class Algorithm
 	{
 		#region Constants: private
+
 		private const int IterationsNumber = 1000;
 		private const double Alpha = .5;
 		private const double Beta = .5;
 		private const double Q = 1;
 		private const double Rho = .1;
+
 		#endregion
 
 		#region Properties: private
+
 		private int ProblemSize { get; set; }
 
 		private List<Vertex> Vertices { get; } = new List<Vertex>();
@@ -24,14 +27,18 @@ namespace ACO
 		private List<Edge> Edges { get; } = new List<Edge>();
 
 		private List<Ant> Ants { get; } = new List<Ant>();
+
 		#endregion
 
 		public bool ParseFile(string fileName)
 		{
 			DirectoryInfo directoryInfo = Directory.GetParent(Directory.GetCurrentDirectory()).Parent;
 			if (directoryInfo == null)
+			{
 				return false;
-			var filePath = Path.Combine(directoryInfo.FullName, fileName);
+			}
+
+			string filePath = Path.Combine(directoryInfo.FullName, fileName);
 			using (var sr = new StreamReader(filePath))
 			{
 				string line;
@@ -39,17 +46,23 @@ namespace ACO
 				while ((line = sr.ReadLine()) != null)
 				{
 					if (line.Length == 0)
+					{
 						continue;
+					}
 
 					if (line[0] == 'p')
+					{
 						ProblemSize = Convert.ToInt32(Regex.Match(line, @"\d+").Value);
+					}
 
 					if (line[0] == 'i')
 					{
 						MatchCollection matches = Regex.Matches(line, @"\d+");
 
 						if (matches.Count != ProblemSize)
+						{
 							return false;
+						}
 
 						var vertex = new Vertex();
 						for (var i = 0; i < matches.Count; i++)
@@ -66,14 +79,16 @@ namespace ACO
 								vertex.EdgesIndexes.Add(Vertices[i].EdgesIndexes[Vertices.Count]);
 								continue;
 							}
+
 							Edges.Add(new Edge
 							{
 								Weight = weight,
 								Pheromones = random.NextDouble(),
-								Vertices = new List<int> { i, Vertices.Count }
+								Vertices = new List<int> {i, Vertices.Count}
 							});
 							vertex.EdgesIndexes.Add(Edges.Count - 1);
 						}
+
 						Vertices.Add(vertex);
 					}
 				}
@@ -85,7 +100,9 @@ namespace ACO
 		private void Init(int colonySize)
 		{
 			for (var i = 0; i < colonySize; i++)
+			{
 				Ants.Add(new Ant());
+			}
 		}
 
 		public void Run(int colonySize)
@@ -99,32 +116,43 @@ namespace ACO
 			for (var iter = 0; iter < IterationsNumber; iter++)
 			{
 				// Evaporate pheromones
-				foreach (var edge in Edges)
+				foreach (Edge edge in Edges)
+				{
 					edge.Pheromones *= 1 - Rho;
+				}
 
-				foreach (var ant in Ants)
+				foreach (Ant ant in Ants)
 				{
 					// Generate solutions
 					var n = 0.0;
 
 					for (var i = 0; i < ProblemSize; i++)
 					{
-						var edgeIdx = Vertices[ant.VisitedVertices.Last()].EdgesIndexes[i];
+						int edgeIdx = Vertices[ant.VisitedVertices.Last()].EdgesIndexes[i];
 						if (edgeIdx == -1 || ant.VisitedVertices.Contains(Edges[edgeIdx].Vertices.First(t => t != ant.VisitedVertices.Last())))
+						{
 							continue;
+						}
+
 						n += Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
-							 Math.Pow(Edges[edgeIdx].Pheromones, Beta);
+						     Math.Pow(Edges[edgeIdx].Pheromones, Beta);
 					}
 
 					for (var i = 0; i < ProblemSize; i++)
 					{
-						var edgeIdx = Vertices[ant.VisitedVertices.Last()].EdgesIndexes[i];
+						int edgeIdx = Vertices[ant.VisitedVertices.Last()].EdgesIndexes[i];
 						if (edgeIdx == -1 || ant.VisitedVertices.Contains(Edges[edgeIdx].Vertices.First(t => t != ant.VisitedVertices.Last())))
+						{
 							continue;
+						}
 
-						var p = Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
-							Math.Pow(Edges[edgeIdx].Pheromones, Beta) / n;
-						if (!(random.NextDouble() <= p)) continue;
+						double p = Math.Pow(Edges[edgeIdx].InvertedWeight, Alpha) *
+						           Math.Pow(Edges[edgeIdx].Pheromones, Beta) / n;
+						if (!(random.NextDouble() <= p))
+						{
+							continue;
+						}
+
 						ant.VisitedVertices.Add(i);
 						ant.UsedEdges.Add(edgeIdx);
 						ant.PathWeight += Edges[edgeIdx].Weight;
@@ -134,9 +162,11 @@ namespace ACO
 					// Update pheromones
 					if (ant.VisitedVertices.Last() == ProblemSize - 1)
 					{
-						var delta = Q / ant.PathWeight;
-						foreach (var edgeIdx in ant.UsedEdges.Where(edgeIdx => edgeIdx != -1))
+						double delta = Q / ant.PathWeight;
+						foreach (int edgeIdx in ant.UsedEdges.Where(edgeIdx => edgeIdx != -1))
+						{
 							Edges[edgeIdx].Pheromones += delta;
+						}
 
 						if (ant.PathWeight < bestWeight)
 						{
@@ -157,7 +187,7 @@ namespace ACO
 			}
 
 			Console.WriteLine($"\nBest way: {bestWay}\nIts weight: {bestWeight}" +
-							  $"\nLast improvement was on iteration #{lastImprovementOn}");
+			                  $"\nLast improvement was on iteration #{lastImprovementOn}");
 		}
 	}
 }
